@@ -24,11 +24,13 @@
       <p>
         <!-- <h1>{{ detected_e }}</h1> -->
 
-        <button v-on:click="angry()">โกรธ</button>
-        <button v-on:click="neutral()">เฉยๆ</button>
-        <button v-on:click="happy()">มีความสุข</button>
-        <button v-on:click="sad()">เศร้า</button>
-        <button v-on:click="surprise()">ประหลาดใจ</button>
+        <button :disabled="isDisabled" v-on:click="angry()">โกรธ</button>
+        <button :disabled="isDisabled" v-on:click="neutral()">เฉยๆ</button>
+        <button :disabled="isDisabled" v-on:click="happy()">มีความสุข</button>
+        <button :disabled="isDisabled" v-on:click="sad()">เศร้า</button>
+        <button :disabled="isDisabled" v-on:click="surprise()">
+          ประหลาดใจ
+        </button>
       </p>
       <h1>{{ score }}</h1>
     </template>
@@ -50,6 +52,7 @@ export default {
   },
   data: function () {
     return {
+      isDisabled: false,
       emotions: ["โกรธ", "เฉยๆ", "มีความสุข", "เศร้า", "ประหลาดใจ"],
       classifier: null,
       mobilenet: null,
@@ -72,6 +75,7 @@ export default {
       let selected = document.getElementById("emotion_options");
       this.class = selected.options[selected.selectedIndex].value;
       this.addExample();
+      // this.$swal('ถ่ายรูปเสร็จแล้ว','','success');
     },
     addExample() {
       const img = tf.fromPixels(this.$children[0].webcam.webcamElement);
@@ -85,35 +89,57 @@ export default {
       console.log(pred);
       this.detected_e = this.emotions[pred.classIndex];
       this.registerEmotion();
+      this.isDisabled = false;
+      this.$swal("ตรวจจับอารมณ์เรียบร้อย", "", "success");
     },
     angry() {
       if (this.detected_e == "โกรธ") {
         this.score = this.score + 1;
         console.log(this.score);
+        this.isDisabled = true;
+        this.$swal("ถูกต้องนะครับ", "", "success");
+      } else {
+        this.$swal("ลองใหม่น้า", "", "error");
       }
     },
     neutral() {
       if (this.detected_e == "เฉยๆ") {
         this.score = this.score + 1;
         console.log(this.score);
+        this.isDisabled = true;
+        this.$swal("ถูกต้องนะครับ", "", "success");
+      } else {
+        this.$swal("ลองใหม่น้า", "", "error");
       }
     },
     happy() {
       if (this.detected_e == "มีความสุข") {
         this.score = this.score + 1;
         console.log(this.score);
+        this.isDisabled = true;
+        this.$swal("ถูกต้องนะครับ", "", "success");
+      } else {
+        this.$swal("ลองใหม่น้า", "", "error");
       }
     },
     sad() {
       if (this.detected_e == "เศร้า") {
         this.score = this.score + 1;
         console.log(this.score);
+        this.isDisabled = true;
+        this.$swal("ถูกต้องนะครับ", "", "success");
+      } else {
+        this.$swal("ลองใหม่น้า", "", "error");
       }
     },
     surprise() {
       if (this.detected_e == "ประหลาดใจ") {
         this.score = this.score + 1;
         console.log(this.score);
+        this.isDisabled = true;
+        this.$swal("ถูกต้องนะครับ", "", "success");
+      } else {
+        this.$swal("ลองใหม่น้า", "", "error");
       }
     },
     changeOption() {
