@@ -2,7 +2,7 @@
   <div class="train">
     <header>
       <template v-if="mode == 'train'">
-        <h1 class="underline decoration-solid">ถ่ายรูปตามอารมณ์ต่าง ๆ</h1>
+        <h1>ถ่ายรูปตามอารมณ์ต่าง ๆ</h1>
       </template>
       <template v-else>
         <h1>มาลองเล่นกันเถอะ!</h1>
@@ -15,6 +15,8 @@
         </select>
       </div>
     </header>
+
+    <Tutorial v-if="isModalVisible == true" />
 
     <nav>
       <Camera></Camera>
@@ -43,31 +45,33 @@
           <button
             class="button-one"
             :disabled="isDisabled"
-            v-on:click="angry()"
+            v-on:click="answer_emotion('โกรธ')"
           >
             โกรธ
           </button>
           <button
             class="button-one"
             :disabled="isDisabled"
-            v-on:click="neutral()"
+            v-on:click="answer_emotion('เฉยๆ')"
           >
             เฉยๆ
           </button>
           <button
             class="button-one"
             :disabled="isDisabled"
-            v-on:click="happy()"
+            v-on:click="answer_emotion('มีความสุข')"
           >
             มีความสุข
           </button>
-          <button class="button-one" :disabled="isDisabled" v-on:click="sad()">
+          <button class="button-one" 
+          :disabled="isDisabled" 
+          v-on:click="answer_emotion('เศร้า')">
             เศร้า
           </button>
           <button
             class="button-one"
             :disabled="isDisabled"
-            v-on:click="surprise()"
+            v-on:click="answer_emotion('ประหลาดใจ')"
           >
             ประหลาดใจ
           </button>
@@ -85,11 +89,13 @@ import * as tf from "@tensorflow/tfjs";
 import * as mobilenetModule from "@tensorflow-models/mobilenet";
 import * as knnClassifier from "@tensorflow-models/knn-classifier";
 import axios from "axios";
+import Tutorial from '@/components/Tutorial.vue';
 
 export default {
   name: "Home",
   components: {
     Camera,
+    Tutorial
   },
   data: function () {
     return {
@@ -103,9 +109,15 @@ export default {
       detected_e: null,
       mode: "train",
       score: 0,
+      isModalVisible: true,
     };
   },
-  mounted: function () {
+  mounted() {
+    const thisInstance = this
+    this.$root.$on('closeModal', function() {
+      thisInstance.closeModal()
+    });
+
     this.init();
   },
   methods: {
@@ -114,6 +126,9 @@ export default {
       this.classifier = knnClassifier.create();
       this.mobilenet = await mobilenetModule.load();
     },
+    closeModal() {
+      this.isModalVisible = false;
+    },
     trainModel() {
       let selected = document.getElementById("emotion_options");
       this.class = selected.options[selected.selectedIndex].value;
@@ -121,7 +136,7 @@ export default {
       // this.saveEmotionList.push(this.class);
       this.$swal(
         "บันทึกอารมณ์สำเร็จ",
-        "หากต้องการเปลี่ยนสามารถถ่ายรูปใหม่ได้",
+        "สามารถเริ่มเล่นเกมได้แล้ว",
         "success"
       );
       this.disabledButton = false;
@@ -141,54 +156,18 @@ export default {
       this.isDisabled = false;
       this.$swal("ตรวจจับอารมณ์เรียบร้อย", "", "success");
     },
-    angry() {
-      if (this.detected_e == "โกรธ") {
+    answer_emotion(emote) {
+      if (this.detected_e == emote) {
         this.score = this.score + 1;
         console.log(this.score);
         this.isDisabled = true;
-        this.$swal("ถูกต้องนะครับ", "", "success");
+        var audio = new Audio(require('@/assets/CorrectSound.mp3'));
+        audio.play();
+        this.$swal("ถูกต้อง", "เอาไปเลย 1 คะแนน", "success");
       } else {
-        this.$swal("ลองใหม่น้า", "", "error");
-      }
-    },
-    neutral() {
-      if (this.detected_e == "เฉยๆ") {
-        this.score = this.score + 1;
-        console.log(this.score);
-        this.isDisabled = true;
-        this.$swal("ถูกต้องนะครับ", "", "success");
-      } else {
-        this.$swal("ลองใหม่น้า", "", "error");
-      }
-    },
-    happy() {
-      if (this.detected_e == "มีความสุข") {
-        this.score = this.score + 1;
-        console.log(this.score);
-        this.isDisabled = true;
-        this.$swal("ถูกต้องนะครับ", "", "success");
-      } else {
-        this.$swal("ลองใหม่น้า", "", "error");
-      }
-    },
-    sad() {
-      if (this.detected_e == "เศร้า") {
-        this.score = this.score + 1;
-        console.log(this.score);
-        this.isDisabled = true;
-        this.$swal("ถูกต้องนะครับ", "", "success");
-      } else {
-        this.$swal("ลองใหม่น้า", "", "error");
-      }
-    },
-    surprise() {
-      if (this.detected_e == "ประหลาดใจ") {
-        this.score = this.score + 1;
-        console.log(this.score);
-        this.isDisabled = true;
-        this.$swal("ถูกต้องนะครับ", "", "success");
-      } else {
-        this.$swal("ลองใหม่น้า", "", "error");
+        var audio = new Audio(require('@/assets/IncorrectSound.mp3'));
+        audio.play();
+        this.$swal("ยังไม่ถูกนะ", "ลองใหม่น้า", "error");
       }
     },
     changeOption() {
@@ -208,8 +187,13 @@ export default {
 };
 </script>
 <style>
+h1 {
+  font-size: 55px;
+}
 h3 {
   color: white;
+  font-size: 25px;
+  margin-bottom: 30px;
 }
 button {
   padding: 0;
@@ -218,6 +202,7 @@ button {
   color: rgb(255, 255, 255);
   background-color: transparent;
   cursor: pointer;
+  
 }
 button:focus {
   outline: 0;
@@ -226,11 +211,6 @@ button:disabled {
   background-color: rgb(164, 164, 164);
   color: rgb(255, 255, 255);
   cursor: not-allowed;
-}
-button {
-  /* padding: 10px; */
-  margin: 10px;
-  /*   outline: 1px dotted black; */
 }
 
 .fas,
@@ -241,6 +221,9 @@ button {
   padding: 10px 15px;
   background-color: rgb(45, 153, 189);
   border-radius: 10px;
+  width: 200px;
+  height: 60px;
+  font-size: 1.8em;
 }
 .button-two:hover {
   box-shadow: 0 3px 6px black;
@@ -251,9 +234,14 @@ button {
 }
 
 .button-one {
-  padding: 10px 15px;
+  /* padding: 10px 15px; */
+  margin: 10px;
+  padding-bottom: 45px;
   background-color: rgb(189, 45, 151);
   border-radius: 10px;
+  width: 170px;
+  height: 40px;
+  font-size: 1.8em;
 }
 .button-one:hover {
   box-shadow: 0 3px 6px black;
@@ -264,10 +252,14 @@ button {
 }
 
 .button-three {
-  margin-top: 100px;
+  margin-top: 45px;
+  margin-bottom: 10px;
   padding: 10px 10px;
   background-color: rgb(45, 153, 189);
   border-radius: 10px;
+  width: 250px;
+  height: 60px;
+  font-size: 1.8em;
 }
 .button-three:hover {
   box-shadow: 0 3px 6px black;
@@ -279,17 +271,21 @@ button {
 
 /* dropdown select */
 option {
+  font-family: 'Mitr';
   color: #000000;
   text-align: center;
 }
 
 select {
-  padding: 10px;
+  font-family: 'Mitr';
+  /* padding: 10px; */
   background: #ffffff;
   color: rgb(0, 0, 0);
-  font-size: 1em;
-  margin: 10px;
+  font-size: 1.8em;
+  /* margin: 10px; */
   border-radius: 10px;
+  width: 200px;
+  height: 60px;
 }
 
 .select-two {
@@ -336,7 +332,7 @@ header {
   background-color: #e5e5f7;
   background-image: radial-gradient(#444cf7 0.5px, #d0d0fa 0.5px);
   background-size: 10px 10px;
-  padding: 40px;
+  padding: 20px;
   text-align: center;
   /* font-size: 35px; */
   color: rgb(0, 0, 0);
