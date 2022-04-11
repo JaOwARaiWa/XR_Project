@@ -1,28 +1,35 @@
 <template>
   <div class="">
-      <video autoplay playsinline muted id="webcam" width="250" height="250"></video>
+    <video
+      autoplay
+      playsinline
+      muted
+      id="webcam"
+      width="400"
+      height="400"
+    ></video>
   </div>
 </template>
 
 <script>
-import {Webcam} from '../assets/webcam'
+import { Webcam } from "../assets/webcam";
 
 export default {
   name: "Camera",
-  data: function(){
-      return {
-          webcam: null,
-      }
+  data: function () {
+    return {
+      webcam: null,
+    };
   },
-  mounted: function(){
-      this.loadWebcam();
+  mounted: function () {
+    this.loadWebcam();
   },
   methods: {
-      loadWebcam: function(){
-          this.webcam = new Webcam(document.getElementById('webcam'));
-          this.webcam.setup();
-      }
-  }
+    loadWebcam: function () {
+      this.webcam = new Webcam(document.getElementById("webcam"));
+      this.webcam.setup();
+    },
+  },
 };
 </script>
 

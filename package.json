@@ -13,14 +13,20 @@
     "@tensorflow/tfjs": "^0.12.5",
     "axios": "^0.18.0",
     "vue": "^2.5.17",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-sweetalert-icons": "^4.3.0",
+    "vue-sweetalert2": "^5.0.2",
+    "vue-tailwind": "^2.5.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.1",
     "@vue/cli-plugin-eslint": "^3.0.1",
     "@vue/cli-service": "^3.0.1",
     "@vue/eslint-config-prettier": "^3.0.1",
+    "autoprefixer": "^9.0.0",
     "lint-staged": "^7.2.2",
+    "postcss": "^8.4.12",
+    "tailwindcss": "^3.0.23",
     "vue-template-compiler": "^2.5.17"
   },
   "gitHooks": {
